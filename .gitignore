@@ -1,0 +1,47 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+build/
+dist/
+
+# Dependency directories
+.pnp/
+.pnp.js
+
+# Production environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+yarn-error.log
+npm-debug.log
+pnpm-debug.log
+lerna-debug.log
+
+# Testing-related
+coverage/
+jest/
+.DS_Store
+/.cache/
+*.tsbuildinfo
+
+# Miscellaneous
+*.bak
+*.tmp
+*.lock
+
