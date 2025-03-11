@@ -1,13 +1,12 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { AnimatedText } from "@/components/animations/animated-text"
-import { AnimatedSkillBar } from "@/components/enhanced/animated-skill-bar"
 import { TimelineItem } from "@/components/enhanced/timeline-item"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import { skills, experiences, education } from "@/data/skills"
+import { MagazineSkillsSection } from "@/components/enhanced/magazine-skills-section"
 import { ParallaxSection } from "@/components/enhanced/parallax-section"
 import { Background3D } from "@/components/enhanced/background-3d"
 
@@ -15,6 +14,58 @@ export const metadata = {
   title: 'About Me | Software Engineer Portfolio',
   description: 'Learn more about my background, skills, and experience as a software engineer.',
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROFESSIONAL, CONCISE EXPERIENCE & EDUCATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+const experiences = [
+  {
+    period: "Aug 2021 – Present",
+    title: "Senior Software Engineer",
+    company: "Apple, San Francisco, CA",
+    description: `
+I joined Apple in August 2021 to build a standardized data ingestion framework using Spark, Flink, Beam, and Iceberg, simplifying data workflows across teams. I developed monitoring with Grafana and Prometheus for clear pipeline metrics and led the implementation of a cross-platform catalog that supports Kafka, Hive, and S3. I also integrated DataHub to establish metadata governance, and optimized ML pipelines (XGBoost, SMOTE) with Spark and SageMaker to streamline analytics workloads.
+`
+  },
+  {
+    period: "Sep 2019 – Aug 2021",
+    title: "Senior Software Engineer",
+    company: "PayPal, San Francisco, CA",
+    description: `
+At PayPal, I created a data pipeline to manage event streams in a GCP-based data lake using DataFlow. I introduced schema discovery and management services to maintain consistent data models across multiple business units. I built a Docker + AWS analytics environment for standardized Python/R libraries, and contributed to PayPal’s recommendation system by handling both offline model training and real-time serving.
+`
+  },
+  {
+    period: "Jan 201? – Sep 2019",
+    title: "Data Engineer",
+    company: "Nielsen, Chicago, IL",
+    description: `
+While at Nielsen, I designed a scalable data ingestion platform with NiFi, Kafka, and Spark following a Lambda architecture for batch and streaming workloads. I focused on deduplication and identity resolution using Spark GraphFrames and TF-IDF, merging multi-source records accurately. This supported real-time audience pipelines and Elasticsearch-based targeting. I also implemented ML-Ops frameworks to support model training and deployment.
+`
+  }
+]
+
+const education = [
+  {
+    year: "Jan 2021 – May 2023",
+    degree: "Master of Science in Analytics",
+    field: "Major in Analytics",
+    institution: "Georgia Institute of Technology"
+  },
+  {
+    year: "Aug 2012 – Jul 2014",
+    degree: "Master of Science in Computer Science & Eng.",
+    field: "GPA: 4.00",
+    institution: "Auburn University"
+  },
+  {
+    year: "Aug 2008 – May 2012",
+    degree: "Bachelor of Science in Electrical & Comp. Eng.",
+    field: "GPA: 3.70",
+    institution: "Auburn University"
+  }
+]
 
 export default function AboutPage() {
   return (
@@ -31,16 +82,16 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
               <div>
                 <AnimatedText 
-                  text="About Me" 
+                  text="Gautam Dudeja" 
                   tag="h1"
                   className="title-xl mb-6"
                 />
                 <p className="subtitle mb-6">
-                  I'm a software engineer specializing in building exceptional digital
+                  I&apos;m a software engineer specializing in building exceptional digital
                   experiences with a focus on AI, ML, and Data Engineering.
                 </p>
                 <p className="text-muted-foreground mb-6">
-                  With over 7 years of experience, I've worked on a wide range of projects
+                  With over 11 years of experience, I&apos;ve worked on a wide range of projects
                   from real-time analytics platforms to machine learning systems, helping
                   organizations leverage their data to gain insights and build intelligent
                   applications.
@@ -59,7 +110,7 @@ export default function AboutPage() {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/20 to-blue-500/20 animate-pulse"></div>
                 <div className="absolute inset-2 rounded-full overflow-hidden">
                   <Image
-                    src="/images/profile.svg"
+                    src="/images/profile.jpeg"
                     alt="Profile"
                     fill
                     className="object-cover"
@@ -71,40 +122,8 @@ export default function AboutPage() {
           </div>
         </section>
         
-        {/* Skills Section */}
-        <ParallaxSection direction="up" speed={0.2} className="py-24 bg-muted/30">
-          <div className="container-wide">
-            <div className="text-center mb-16">
-              <AnimatedText 
-                text="Skills & Expertise" 
-                tag="h2"
-                className="title-lg mb-4"
-              />
-              <p className="subtitle max-w-2xl mx-auto">
-                Technologies and tools I've worked with extensively.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-              {skills.map((skillGroup, groupIndex) => (
-                <div key={skillGroup.category}>
-                  <h3 className="font-serif text-2xl font-bold mb-6">{skillGroup.category}</h3>
-                  <div className="space-y-6">
-                    {skillGroup.items.map((skill, skillIndex) => (
-                      <AnimatedSkillBar
-                        key={skill.name}
-                        label={skill.name}
-                        percentage={skill.level}
-                        delay={0.1 * skillIndex}
-                        color={groupIndex % 2 === 0 ? "bg-primary" : "bg-blue-500"}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </ParallaxSection>
+        {/* Skills Section - if needed, pass real data in place of [] */}
+        <MagazineSkillsSection skills={[]} />
         
         {/* Career Timeline */}
         <section className="py-24">

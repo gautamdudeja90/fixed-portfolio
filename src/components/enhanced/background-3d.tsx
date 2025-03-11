@@ -9,7 +9,8 @@ interface Background3DProps {
   color?: string
   backgroundColor?: string
   mouseMultiplier?: number
-  showPoints?: boolean
+  density?: number
+  particleSize?: number
 }
 
 export function Background3D({
@@ -17,12 +18,12 @@ export function Background3D({
   color = "#3B82F6",
   backgroundColor = "transparent",
   mouseMultiplier = 0.4,
-  showPoints = true,
+  density = 1500,
+  particleSize = 0.015,
 }: Background3DProps) {
   const isClient = useClientOnly()
   const containerRef = useRef<HTMLDivElement>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const raycaster = useRef(new THREE.Raycaster())
   const mouse = useRef(new THREE.Vector2())
   const animationFrameId = useRef<number>()
   
@@ -34,32 +35,47 @@ export function Background3D({
     
     // Scene setup
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(backgroundColor)
+    scene.background = backgroundColor === "transparent" 
+      ? null 
+      : new THREE.Color(backgroundColor)
     
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
+    // Camera setup with refined FOV and position
+    const camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 1000)
     camera.position.z = 5
     
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
+    // Renderer setup with antialiasing and alpha
+    const renderer = new THREE.WebGLRenderer({ 
+      alpha: true, 
+      antialias: true,
+      powerPreference: "high-performance" 
+    })
     renderer.setSize(width, height)
-    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     containerRef.current.appendChild(renderer.domElement)
     
-    // Create particles
+    // Create particles with improved distribution
     const particlesGeometry = new THREE.BufferGeometry()
-    const particlesCount = 1000
+    const particlesCount = density
     const posArray = new Float32Array(particlesCount * 3)
     
-    for (let i = 0; i < particlesCount * 3; i++) {
-      posArray[i] = (Math.random() - 0.5) * 10
+    // Modified distribution for more natural clustering
+    for (let i = 0; i < particlesCount * 3; i += 3) {
+      // Create clusters in 3D space
+      const radius = 10
+      const theta = THREE.MathUtils.randFloatSpread(360) 
+      const phi = THREE.MathUtils.randFloatSpread(360)
+      
+      posArray[i] = radius * Math.sin(theta) * Math.cos(phi) * Math.random()
+      posArray[i + 1] = radius * Math.sin(theta) * Math.sin(phi) * Math.random()
+      posArray[i + 2] = radius * Math.cos(theta) * Math.random()
     }
     
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3))
     
-    // Materials
+    // Advanced particle material with bloom effect
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.02,
+      size: particleSize,
+      sizeAttenuation: true,
       color: new THREE.Color(color),
       transparent: true,
       opacity: 0.8,
@@ -70,33 +86,14 @@ export function Background3D({
     const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial)
     scene.add(particlesMesh)
     
-    // Create lines
-    const linesMaterial = new THREE.LineBasicMaterial({
-      color: new THREE.Color(color),
-      transparent: true,
-      opacity: 0.2,
-    })
+    // Add subtle ambient light
+    const ambientLight = new THREE.AmbientLight(color, 0.1)
+    scene.add(ambientLight)
     
-    const linesGeometry = new THREE.BufferGeometry()
-    const linesArray = new Float32Array(particlesCount * 3)
-    
-    for (let i = 0; i < particlesCount * 3; i += 3) {
-      linesArray[i] = posArray[i]
-      linesArray[i + 1] = posArray[i + 1]
-      linesArray[i + 2] = posArray[i + 2]
-    }
-    
-    linesGeometry.setAttribute('position', new THREE.BufferAttribute(linesArray, 3))
-    const linesMesh = new THREE.Line(linesGeometry, linesMaterial)
-    scene.add(linesMesh)
-    
-    // Animation
+    // Animation with improved rotation
     const animate = () => {
-      particlesMesh.rotation.x += 0.0005
-      particlesMesh.rotation.y += 0.0005
-      
-      linesMesh.rotation.x = particlesMesh.rotation.x
-      linesMesh.rotation.y = particlesMesh.rotation.y
+      particlesMesh.rotation.x += 0.0002
+      particlesMesh.rotation.y += 0.0003
       
       renderer.render(scene, camera)
       animationFrameId.current = requestAnimationFrame(animate)
@@ -105,16 +102,21 @@ export function Background3D({
     animate()
     setIsLoaded(true)
     
-    // Mouse movement
+    // Enhanced mouse movement
     const handleMouseMove = (event: MouseEvent) => {
       const rect = containerRef.current?.getBoundingClientRect()
       if (!rect) return
       
+      // Normalized mouse coordinates
       mouse.current.x = ((event.clientX - rect.left) / width) * 2 - 1
       mouse.current.y = -((event.clientY - rect.top) / height) * 2 + 1
       
-      particlesMesh.rotation.x += mouse.current.y * 0.001 * mouseMultiplier
-      particlesMesh.rotation.y += mouse.current.x * 0.001 * mouseMultiplier
+      // Smoother rotation based on mouse movement
+      particlesMesh.rotation.x += mouse.current.y * 0.0005 * mouseMultiplier
+      particlesMesh.rotation.y += mouse.current.x * 0.0005 * mouseMultiplier
+      
+      // Slight zoom effect
+      camera.position.z += mouse.current.y * 0.005 * mouseMultiplier
     }
     
     window.addEventListener("mousemove", handleMouseMove)
@@ -130,6 +132,7 @@ export function Background3D({
       camera.updateProjectionMatrix()
       
       renderer.setSize(newWidth, newHeight)
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     }
     
     window.addEventListener("resize", handleResize)
@@ -146,8 +149,12 @@ export function Background3D({
       if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
         containerRef.current.removeChild(renderer.domElement)
       }
+      
+      // Dispose resources
+      particlesGeometry.dispose()
+      particlesMaterial.dispose()
     }
-  }, [color, backgroundColor, mouseMultiplier, showPoints, isClient])
+  }, [color, backgroundColor, mouseMultiplier, density, particleSize, isClient])
   
   if (!isClient) {
     return <div className={cn("absolute inset-0 w-full h-full", className)} ref={containerRef} />

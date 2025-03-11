@@ -57,8 +57,9 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)"],
-        serif: ["var(--font-playfair)"],
+        sans: ["var(--font-sans)"],
+        serif: ["var(--font-serif)"],
+        mono: ["var(--font-mono)"],
       },
       keyframes: {
         "accordion-down": {
@@ -69,11 +70,70 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        "fade-up": {
+          "0%": { opacity: 0, transform: "translateY(20px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+        "fade-down": {
+          "0%": { opacity: 0, transform: "translateY(-20px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+        "text-shimmer": {
+          "0%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-up": "fade-up 0.5s ease-out",
+        "fade-down": "fade-down 0.5s ease-out",
+        "text-shimmer": "text-shimmer 3s ease infinite",
+        "float": "float 6s ease-in-out infinite",
       },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            maxWidth: 'none',
+            color: theme('colors.foreground'),
+            a: {
+              color: theme('colors.primary'),
+              textDecoration: 'none',
+              '&:hover': {
+                color: theme('colors.primary'),
+              },
+            },
+            h1: {
+              fontFamily: theme('fontFamily.serif'),
+              fontWeight: '400',
+              letterSpacing: '-0.025em',
+            },
+            h2: {
+              fontFamily: theme('fontFamily.serif'),
+              fontWeight: '400',
+              letterSpacing: '-0.025em',
+            },
+            h3: {
+              fontFamily: theme('fontFamily.serif'),
+              fontWeight: '400',
+            },
+            blockquote: {
+              borderLeftColor: theme('colors.primary'),
+              fontStyle: 'normal',
+            },
+            code: {
+              backgroundColor: theme('colors.muted'),
+              borderRadius: theme('borderRadius.sm'),
+              padding: '0.2em 0.4em',
+              fontWeight: '500',
+            },
+          },
+        },
+      }),
     },
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],

@@ -7,11 +7,18 @@ import Link from "next/link"
 import { Background3D } from "@/components/enhanced/background-3d"
 import { TypingAnimation } from "@/components/enhanced/typing-animation"
 import { RotatingText } from "@/components/enhanced/rotating-text"
+import { HexagonAnimation } from "@/components/enhanced/hexagon-animation"
 import gsap from "gsap"
+
+// 1) Import useTheme
+import { useTheme } from "next-themes"
 
 export function EnhancedHeroSection() {
   const heroRef = useRef<HTMLElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
+
+  // 2) Access the current theme
+  const { theme } = useTheme()
 
   useEffect(() => {
     if (!heroRef.current || !textRef.current) return
@@ -27,18 +34,46 @@ export function EnhancedHeroSection() {
     return () => ctx.revert()
   }, [])
 
+  // 3) Decide opacities based on theme
+  const isDark = theme === "dark"
+  const leftOpacity = isDark ? 1 : 0.3
+  const rightOpacity = isDark ? 1 : 0.3
+
   return (
     <section
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* 3D Background */}
-      <Background3D className="opacity-40" />
+      {/* Left half animation (rotating in one direction) */}
+      <div className="absolute top-0 left-0 w-1/2 h-full overflow-hidden pointer-events-none">
+        <HexagonAnimation
+          opacity={leftOpacity}
+          rotationSpeedY={0.003} // spins clockwise
+        />
+      </div>
 
-      {/* Gradient overlay */}
+      {/* Right half animation (rotating in the opposite direction) */}
+      <div className="absolute top-0 right-0 w-1/2 h-full overflow-hidden pointer-events-none">
+        <HexagonAnimation
+          opacity={rightOpacity}
+          rotationSpeedY={-0.003} // spins counter-clockwise
+        />
+      </div>
+
+      {/* 3D Background (optional) */}
+      <Background3D
+        color="hsl(var(--primary) / 0.6)"
+        backgroundColor="transparent"
+        mouseMultiplier={0.3}
+      />
+
+      {/* Elegant gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/50 to-background pointer-events-none" />
 
-      {/* Content */}
+      {/* Subtle dot pattern */}
+      <div className="absolute inset-0 opacity-10 dot-pattern pointer-events-none" />
+
+      {/* Centered Hero Text */}
       <div className="container-wide relative z-10 mt-16" ref={textRef}>
         <motion.div
           initial={{ opacity: 0 }}
@@ -50,18 +85,18 @@ export function EnhancedHeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mb-6 font-serif"
+            className="mb-8"
           >
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+            <h1 className="title-xl mb-3">
+              <span className="block font-light tracking-wider text-base uppercase text-primary mb-3"></span>
               <span className="block">Engineering the</span>
               <span className="block mt-2">
                 Future of{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">
-                  <RotatingText
-                    words={["AI", "Data", "ML", "Cloud"]}
-                    interval={2000}
-                  />
-                </span>
+                <RotatingText
+                  words={["AI", "Data", "ML", "Cloud"]}
+                  interval={2000}
+                  className="text-gradient font-medium"
+                />
               </span>
             </h1>
           </motion.div>
@@ -71,7 +106,7 @@ export function EnhancedHeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto font-light leading-relaxed tracking-wide">
               <TypingAnimation
                 text="Building innovative solutions at the intersection of software engineering, data science, and artificial intelligence."
                 speed={15}
@@ -84,26 +119,22 @@ export function EnhancedHeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-5 justify-center"
           >
-            <Button 
-              size="lg" 
+            <Button
+              variant="outline"
+              size="lg"
               asChild
-              className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 transition-all duration-300"
+              className="border-primary hover:border-primary/40 transition-all duration-500"
             >
-              <Link href="/projects">
-                View Projects <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/contact">
+              <Link href="/contact" className="px-8 py-6 text-base">
                 Get in Touch
               </Link>
             </Button>
           </motion.div>
         </motion.div>
 
-        {/* Scroll indicator */}
+        {/* Refined scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -112,14 +143,14 @@ export function EnhancedHeroSection() {
         >
           <motion.div
             animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
             className="flex flex-col items-center"
           >
-            <span className="text-sm text-muted-foreground mb-2">Scroll Down</span>
+            <span className="text-sm text-muted-foreground font-light tracking-widest uppercase mb-3"></span>
             <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }}
+              animate={{ opacity: [0.3, 1, 0.3], height: [20, 30, 20] }}
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              className="w-0.5 h-10 bg-muted-foreground/50 rounded-full"
+              className="w-px bg-primary/50 rounded-full"
             />
           </motion.div>
         </motion.div>

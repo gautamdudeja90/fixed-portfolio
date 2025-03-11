@@ -41,7 +41,10 @@ export function RotatingText({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -20, opacity: 0 }}
-          transition={{ duration: transitionDuration }}
+          transition={{ 
+            duration: transitionDuration,
+            ease: [0.22, 1, 0.36, 1]
+          }}
           className="inline-block"
         >
           {words[index]}

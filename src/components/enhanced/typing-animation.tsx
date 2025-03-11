@@ -67,22 +67,34 @@ export function TypingAnimation({
   }, [text, speed, delay])
   
   return (
-    <span className={cn("inline-block", className)}>
+    <span className={cn("relative inline-block", className)}>
       {displayedText}
       {showCursor && (
         <motion.span
           className={cn(
-            "inline-block w-[0.1em] h-[1.2em] bg-current translate-y-[0.1em] mx-[0.04em]",
+            "absolute top-0 right-[-0.1em] w-[0.05em] h-[1.1em] bg-primary translate-y-[0.1em]",
             cursorClassName
           )}
           initial={{ opacity: 0 }}
-          animate={{ opacity: isTypingComplete ? [0, 1] : 1 }}
+          animate={{ 
+            opacity: isTypingComplete ? [0, 1] : 1,
+            height: isTypingComplete ? ["1.1em", "1.1em"] : ["0.2em", "1.1em"],
+          }}
           transition={isTypingComplete ? { 
-            duration: 0.01, 
-            repeat: Infinity, 
-            repeatType: "reverse", 
-            repeatDelay: cursorBlinkSpeed / 1000 / 2 
-          } : {}}
+            opacity: {
+              duration: 0.01, 
+              repeat: Infinity, 
+              repeatType: "reverse", 
+              repeatDelay: cursorBlinkSpeed / 1000 / 2
+            }
+          } : {
+            height: {
+              duration: 0.5,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            }
+          }}
         />
       )}
     </span>
